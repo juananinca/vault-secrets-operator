@@ -94,6 +94,14 @@ spec:
               fieldPath: metadata.uid
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ .Values.controller.kubernetesClusterDomain }}
+        {{- if .Values.defaultVaultConnection.mtls.enabled }}
+        - name: VAULT_CACERT
+          value: /opt/vault/ssl/ca.crt
+        - name: VAULT_CLIENT_CERT
+          value: {{ .Values.defaultVaultConnection.mtls.clientCertPath }}
+        - name: VAULT_CLIENT_KEY
+          value: {{ .Values.defaultVaultConnection.mtls.clientKeyPath }}
+        {{- end }}
         {{- range .Values.controller.manager.extraEnv }}
         - name: {{ .name }}
           value: {{ .value }}
@@ -118,6 +126,10 @@ spec:
         volumeMounts:
         - mountPath: /var/run/podinfo
           name: podinfo
+        {{- if .Values.defaultVaultConnection.mtls.enabled }}
+        - mountPath: /opt/vault/ssl
+          name: vault-mtls-certs-secret
+        {{- end }}
       securityContext:
         {{- toYaml .Values.controller.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "vso.chart.fullname" . }}-controller-manager
@@ -139,6 +151,11 @@ spec:
       {{- toYaml .Values.controller.affinity | nindent 8 }}
       {{- end }}
       volumes:
+      {{- if .Values.defaultVaultConnection.mtls.enabled }
+      - name: vault-mtls-certs-secret
+        secret:
+          secretName: mtls-cert-secret
+      {{- end}}
       - downwardAPI:
           items:
           - fieldRef:

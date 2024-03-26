@@ -456,6 +456,24 @@ defaultVaultConnection:
   # @type: map
   headers: {}
 
+  # Enable mTLS for Vault connections.
+  mtls:
+  
+    # toggles the deployment of the VaultAuthMethod CR
+    # @type: boolean
+    enabled: false
+
+    # clientCertPath is the path to the client certificate for TLS authentication.
+    # @type: string
+    clientCertFilePath: "/tmp/vault/ssl/client.pem"
+
+    # clientKeyPath is the path to the client key for TLS authentication.
+    # @type: string
+    clientKeyFilePath: "/tmp/vault/ssl/client-key.pem"
+
+    # caCertPath is the path to the CA certificate for TLS authentication.
+    # @type: string
+    caCertFilePath: "/tmp/vault/ssl/ca.pem"
 
 # Configures and deploys the default VaultAuthMethod CR which will be used by resources
 # if they do not specify a VaultAuthMethod reference. The name is 'default' and will
